@@ -1,4 +1,6 @@
 digraph G {
+
+//command: dot -Ktwopi -Tpng 8.dot -o 8.png
  ranksep=3;
  ratio=auto;
 "1" [ label="02f5daf56e299b8a8ecea892",shape="hexagon",style="filled",color="green" ];

@@ -10,4 +10,4 @@
     ]
  }
  
- dot -Kfdp -n -Tpng -o 5.png 5.dot
+//  dot -Kfdp -n -Tpng -o 5.png 5.dot

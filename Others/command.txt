@@ -1,4 +1,5 @@
 dot -Kcirco -Tpng BundleLoad.dot. -o sample.png
+dot -Kdot -Tpng 1.dot -o 1.png
 dot -Ktwopi -Tpdf PizzaFactory.dot -o PizzaFactory.pdf
  dot 默认布局方式，主要用于有向图
 neato 基于spring-model(又称force-based)算法   基于斥力+张力的布局
