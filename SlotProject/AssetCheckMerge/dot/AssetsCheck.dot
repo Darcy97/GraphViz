@@ -1,0 +1,176 @@
+    digraph G {
+    bgcolor = "#242931"
+    ranksep = 0.1
+    splines="true";
+    node[color = orange fontcolor = white] 
+    edge [fontcolor = white color = white] //线条颜色
+    // edge [style="setlinewidth(2)"]
+    // graph[fontsize = 100]
+    
+
+    GameStart[URL = "https://jeasonstudio.github.io/oxygen-demo/?nsukey=Lkqeha7kcYrpW4Hr3P1fuVQrUg7RBkAvinyWy6Zj1Kfu5yvZQxtYjLxU5%2Boefedtftky7vhacK10NHispltrsMDcBVgYHO9YsqWYiUQncXm3NAvl5vIXQQaSdv0RjKdgWElC1B%2FPE%2FwFrIWkB0nki2MeW50TWDuN7QBtDesMzy%2Bxcxw%2FZ951XHMskOcGR997l02mCVNA43gGGpLzpZBeBQ%3D%3D"]
+
+    GameStart -> InitPlistData[color = white]
+    InitPlistData -> InitLocalCheckData [label = 2 fontsize = 30]
+
+    InitPlistData -> DownLoadRemoteAssetCheckFile[label = 1 fontsize = 30 color = white fontcolor = white]
+    
+    StartAssetsCheck -> IsLoaclContanThisCheck[color =white]
+
+    InitPlistData -> StartAssetsCheck[label = 3 fontsize = 30 fontcolor = white color = white]
+
+    
+
+    # asset file check
+    subgraph clusterAssetCheckServerToLocal{
+        IsLoaclContanThisCheck -> IsNeedUpdate [label = Yes color = green fontcolor = green]
+        IsLoaclContanThisCheck:s -> UpdateLocalAssetCheck [color = red fontcolor = red label = No]
+        IsLoaclContanThisCheck -> UpdateAssetState [color = red fontcolor = red label = No]
+        IsLoaclContanThisCheck:s -> IsEnablePreDownload [color = red fontcolor = red label = No]
+        IsNeedUpdate:s -> IsEnablePreDownload [label = Yes color = green fontcolor = green]
+        IsNeedUpdate -> UpdateAssetState [label = Yes color = green fontcolor = green]
+        IsNeedUpdate:s -> UpdateLocalAssetCheck [label = Yes color = green fontcolor = green]
+        IsNeedUpdate:es -> IsBundleFileExist [label = No color = red fontcolor = red]
+        IsBundleFileExist -> UpdateAssetState [label = No color = red fontcolor = red]
+        IsBundleFileExist -> IsEnablePreDownload [label = No color = red fontcolor = red]
+        IsEnablePreDownload -> BundleDownload [label = Yes color = green fontcolor = green]
+
+        UpdateLocalAssetCheck[label = "更新本地校验文件"]
+        UpdateAssetState[label = "更新assetstate->NeedDownload"]
+
+        IsLoaclContanThisCheck[shape=diamond label = "判断本地是否有对应的\nassetcheckitem"]
+        IsNeedUpdate[shape=diamond label = "根据assetcheck-md5值\n判断是否需要更新bundle文件"]
+        IsEnablePreDownload[shape=diamond label = "是否需要\n预先下载"]     
+        IsBundleFileExist[shape=diamond label = "本地是否存在\nbundle文件"]
+        BundleDownload[label = "{AssetDownloadManager|(void)Download}" shape = record]
+
+        BroadCastAssetCheckDataUpdateFinished[label = "END:广播校验文件更新完毕"] 
+
+        {rank = max BroadCastAssetCheckDataUpdateFinished}
+        {rank = same UpdateAssetState IsLoaclContanThisCheck}
+
+        color = cyan
+        label = "AssetsCheck: server -> local"
+        fontcolor = cyan
+        fontsize = 50
+    }
+    
+    InitLocalCheckData -> IsLocalContainAssetCheckFile [label = 1 fontsize = 50 color = cyan fontcolor = cyan]
+    InitLocalCheckData -> ForeachPkgCheckDatas [label = 2 fontsize = 50 color = orange fontcolor = orange]
+    InitLocalCheckData -> ForeachLocalCheckDatas [ label = 3 fontsize = 50 color = green fontcolor = green]
+    InitLocalCheckData -> ForeachCurrentCheckDatas [label = 4 fontsize = 50 color = yellowgreen fontcolor = yellowgreen]
+    
+    
+
+    subgraph clusterAssetCheckPkgToLocal{
+        color = cyan
+        label = "AssetCheck: pkg -> local"
+        fontcolor = cyan
+        fontsize = 50
+
+
+        subgraph clusterIsLocalExistAssetCheckData{
+            IsLocalContainAssetCheckFile -> IsLoaclAssetCheckFileValid[label = Yes color = green fontcolor = green]
+            IsLoaclAssetCheckFileValid -> DeleteLocalCheckFile[label = No color = red fontcolor = red]
+            DeleteLocalCheckFile[label = "删除本地Checkfile" shape = box color = cyan]
+            IsLoaclAssetCheckFileValid[label = "检查AssetCheckFile\n是否有效" shape = diamond color = cyan]
+            IsLocalContainAssetCheckFile[label = "检查本地是否有\nAssetCheckFile" shape = diamond color = cyan]
+
+            label = "检测本地是否存在\nAssetcheckdata"
+            color = cyan
+            fontcolor = cyan
+            fontsize = 30
+        }
+        
+        subgraph clusterForeachPkgCheckDatas{
+
+            label = "遍历包内\nassetcheckdatas"
+            color = orange
+            fontcolor = orange
+            fontsize = 30
+
+            ForeachPkgCheckDatas -> IsLocalContainThisCheckData[color = white]
+            IsLocalContainThisCheckData -> IsPkgContainThisFile[label = No color = red fontcolor = red]
+            IsPkgContainThisFile:s -> subgraph UpdateAssetStateAndCurrentAssetCheck{
+                _UpdateAssetState
+                _UpdateLocalAssetCheck
+            }[label = No color = red fontcolor = red]
+            IsLocalContainThisCheckData -> IsLocalMd5SameAsPkg[label = Yes color = green fontcolor = green]
+            IsLocalMd5SameAsPkg -> IfLocalAndPkgNotContainThisBundleFile[label = Yes color = green fontcolor = green]
+            IsLocalMd5SameAsPkg -> CompareVersion[label = No color = red fontcolor = red]
+            IfLocalAndPkgNotContainThisBundleFile:s -> subgraph UpdateAssetStateAndCurrentAssetCheck{
+                _UpdateAssetState
+                _UpdateLocalAssetCheck
+            }[label = Yes color = green fontcolor = green]
+            
+            CompareVersion:e -> subgraph{
+                DeleteLocalBundleFile
+                _UpdateAssetState
+                _UpdateLocalAssetCheck
+            }[label = Yes color = green fontcolor = green]
+            CompareVersion -> IsLocalContainThisBundleFile [label = No color = red fontcolor = red]
+            IsLocalContainThisBundleFile:s -> subgraph UpdateAssetStateAndCurrentAssetCheck{
+                _UpdateAssetState
+                _UpdateLocalAssetCheck
+            }[label = No color = red fontcolor = red]
+            
+            [constraint = false];
+            
+            ForeachPkgCheckDatas[label = "遍历包内 checkdata" shape = box]
+            
+            _UpdateLocalAssetCheck[label = "更新Current校验文件" shape = box]
+            _UpdateAssetState[label = "更新assetstate->NeedDownload" shape = box]
+            IsLocalContainThisCheckData[label = "检查本地是否存在\n这条AssetCheckData" shape = diamond]
+            IsPkgContainThisFile[label = "判断包内是否存在\n这条AssetCheckData对应的bundle" shape = diamond]
+            IsLocalMd5SameAsPkg[label = "判断该条AssetCheckData\n的本地md5值与包内的是否相同" shape = diamond]
+            CompareVersion [label = "包内版本号高于本地?" shape = diamond]
+            IsLocalContainThisBundleFile [label = "判断本地是否存在这条\nAssetcheckData对应的bundle文件" shape = diamond]
+            IfLocalAndPkgNotContainThisBundleFile[label = "若本地和pkg都不存在\n对应的bundle文件?" shape = diamond]
+            DeleteLocalBundleFile[label = "删除对应本地bundle文件" shape = box]
+
+            {rank = same IsLocalMd5SameAsPkg CompareVersion IsLocalContainThisCheckData}
+
+        }
+
+       
+        subgraph clusterForeachLocalCheckData{     
+#region logic
+            ForeachLocalCheckDatas:s -> IFPkgNotContainThisCheckDataAndLocalNotExistThisBundleFile[color = white]
+            IFPkgNotContainThisCheckDataAndLocalNotExistThisBundleFile:s -> subgraph{
+                L_UpdateAssetState
+                L_UpdateLocalAssetCheck
+            }[color = green label = Yes fontcolor = green]
+#region
+            ForeachLocalCheckDatas[label = "遍历本地AssetCheckDatas" shape = box color = green]
+            IFPkgNotContainThisCheckDataAndLocalNotExistThisBundleFile[label = "包内不存在这条assetcheckdata\n与本地不存在对应bundle文件" color = green shape = diamond]
+            L_UpdateLocalAssetCheck[label = "更新Current校验文件" shape = box]
+            L_UpdateAssetState[label = "更新assetstate->NeedDownload" shape = box]
+
+            label = "遍历本地CheckDatas"
+            color = green
+            fontcolor = green
+            fontsize = 30
+        }  
+
+        subgraph clusterSubForeachCurrentCheckDatas{
+            node[color = "#E01D64"]
+            ForeachCurrentCheckDatas -> IsNeedDownloadAndEnablePredown[color = white]
+            IsNeedDownloadAndEnablePredown -> _BundleDownload[label = Yes color = green fontcolor = green]
+
+            _BundleDownload[label = "{AssetDownloadManager|(void)Download}" shape = record]
+            ForeachCurrentCheckDatas[label = "遍历整合后的checkdatas" color = "#E01D64"]
+            IsNeedDownloadAndEnablePredown[shape = diamond label="IsNeedDownload\nAndEnablePredown"]
+
+            label = "遍历内存中的\nassetcheckdata"
+            color = "#E01D64"
+            fontcolor = "#E01D64"
+            fontsize = 30
+        }
+
+        Tipe[shape = plaintext label = "只有下载完某一条assetcheckdata\n时候才会去更新assetcheckdata" fontcolor = red]
+        
+
+    }   
+    // edge [style="setlinewidth(2)"]
+    // style = "setedgewidth(5)"
+}

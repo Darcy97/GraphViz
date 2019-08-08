@@ -1,0 +1,61 @@
+digraph G 
+{
+    bgcolor = "#242931"
+
+    // bgcolor = "#2A2B30"
+    // splines="true";
+    ratio = auto
+    ranksep = 0.5
+    // nodesep = 0.1
+    splines="true";
+    // node [color = "#9EC07A" fontcolor = "#5EAFB6" shape = record fontsize = 10] 
+    node [color = "#AD5A5F" fontcolor = "#5EAFB6" shape = record fontsize = 10] 
+    // node [color = "#AD5A5F" fontcolor = "#BDB9B6" shape = record fontsize = 10] 
+    edge [color = "#AD5A5F"fontcolor = "#5EAFB6"] //线条颜色
+
+    ClickSlot 
+    -> CheckEnterSlotMachineCondition 
+    -> CheckDownloadAndEnterSlotScene 
+    -> SwapScene
+    -> BroadCastOpenSceneExchange
+
+    BroadCastOpenSceneExchange:s
+    -> ClassicDialogManagerListen:n
+    
+    ClassicDialogManagerListen
+    -> OpenSceneExchangeDialog
+
+    OpenSceneExchangeDialog:s
+    -> SceneExchange:e
+
+    SceneExchange:w
+    -> LoadScene:n
+
+    LoadSceneAsync
+    -> AddAssetBundle
+    -> LoadAssetBundle
+    -> RemoveAllCacheBundles
+    -> AsyncLoadLevel 
+    -> LoadScene[dir = back]
+
+    Mono -> Dialog -> SceneExchange[dir = back style = dashed color = "#9EC07A"]
+    GameDialogManager:s -> ClassicDialogManagerListen:e [dir = back style = dashed color = "#9EC07A"]
+    
+    {rank = same LoadScene AsyncLoadLevel}
+
+    ClickSlot[label = "{(C) CardCell|(void) ClickSlot}"]
+    CheckEnterSlotMachineCondition[label = "{(C) SwapSceneManager|(void) CheckEnterSlotMachineCondition}"]
+    CheckDownloadAndEnterSlotScene[label = "(void) CheckDownloadAndEnterSlotScene"]
+    SwapScene[label = "(void)SwapScene"]
+    BroadCastOpenSceneExchange[label = "(void) BroadCastOpenSceneExchange"]
+    ClassicDialogManagerListen[label = "{(C) ClassicDialogManagerListen|(void) openSceneExchange}"]
+    GameDialogManager[label = "{(C) GameDialogManager}" shape = box]
+    SceneExchange[label = "{(C) SceneExchange|(void) Start|(void) Refresh}"]
+    LoadScene[label = "(void) LoadScene" shape = box]
+    AsyncLoadLevel[label = "(E) AsyncLoadLevel\n全部异步加载逻辑" shape = box]
+    LoadAssetBundle[label = "(void) LoadAssetBundleScene\n(void) LoadAssetBundleResource" shape = box]
+    AddAssetBundle[label = "{(C) AssetBundleLoadManager|(void) AddSceneAssetBundle|(void) AddResourceAssetBundle}"]
+    RemoveAllCacheBundles[label = "{(C) AssetBundleManager|(void) RemovelAllSlotAssetBundles|(void) RemoveAllCacheAssetBundles}"]
+    // c [shape="none", image="test.jpg", label=""];
+
+}

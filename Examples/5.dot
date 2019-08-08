@@ -1,0 +1,13 @@
+ digraph{
+    xxx [
+        label = xxx
+        pos = "0,0!"
+    ]
+
+    yyy [
+        label = yyy
+        pos = "10,10!"
+    ]
+ }
+ 
+ dot -Kfdp -n -Tpng -o 5.png 5.dot

@@ -1,0 +1,41 @@
+digraph G 
+{
+    bgcolor = "#242931"
+    ranksep = 0.5
+    // nodesep = 0.1
+    splines="true";
+    node [color = orange fontcolor = white shape = box] 
+    edge [fontcolor = white color = white] //线条颜色
+
+    subgraph cluster_start{
+        
+        Local -> Current
+        Remote -> Current
+        Pkg -> Current
+
+        color = green
+        label = GameStart
+        fontcolor = green
+    }
+
+    subgraph cluster_download{
+        node [color = green fontcolor = white shape = box] 
+
+        DownloadSucess -> UpdateCurrentCheckData
+        DownloadSucess -> UpdateLocalCheckData
+        DownloadSucess -> SaveLocalCheckDataToDisk
+
+        SaveLocalCheckDataToDisk[color = red]
+
+        label = "Download slot"
+        color = "#ff9966"
+        fontcolor = "#ff9966"
+
+        // UpdateCurrentCheckData[pos = "2, 2.9!"]
+        // UpdateLocalCheckData[pos = "2, 3!"]
+        // SaveLocalCheckDataToDisk[pos = "2, 3.1!"]
+        // DownloadSucess[pos = "0, 3!"]
+    }
+
+
+}

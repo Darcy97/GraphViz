@@ -1,0 +1,30 @@
+// digraph G {
+//   graph [fontsize=24] //图
+//   edge [fontsize=24 fontcolor = green] //线条
+//   node [fontsize=24]  //节点
+//   ranksep = 1.5 //线最短距离
+//   nodesep = .25 //节点最短距离
+//   edge [style="setlinewidth(4)"]
+//   a -> b -> c[label = s]
+
+//   a -> c -> d ->b
+// }
+
+// digraph G {
+//   compound=true; nodesep=1.0;
+//   subgraph cluster_A {
+//     a -> b; a -> c;
+//     label = A
+//   }
+//   subgraph cluster_B { 
+//     d -> e; f -> e;
+//     label = B
+//   }
+//   a -> e [ ltail=cluster_A, lhead=cluster_B ];
+// }
+
+digraph G {
+    a  -> c;
+    a  -> b;
+    b  -> c [constraint = false];
+  }

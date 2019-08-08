@@ -1,0 +1,9 @@
+@startuml
+start
+:定义Graph属性;
+:定义Node、Edge默认属性;
+:添加Node和Edge;
+:定义特定Node、Edge的个性属性;
+:使用CLI或GUI布局引擎工具渲染绘制;
+end
+@enduml
